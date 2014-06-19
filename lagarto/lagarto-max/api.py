@@ -35,7 +35,7 @@ sys.path.append(MaxDefinitions.lagarto_dir)
 from lagartoresources import LagartoEndpoint, LagartoException
 from xmltools import XmlSettings
 
-from clouding import PachubePacket, ThingSpeakPacket, OpenSensePacket, OpenSense, TwitterMessage, AutoRemotePacket, GroveStreamsPacket
+from clouding import PachubePacket, ThingSpeakPacket, OpenSensePacket, OpenSense, TwitterMessage, AutoRemotePacket, GroveStreamsPacket, DweetMessage
 
 
 class TimeAPI:
@@ -361,6 +361,25 @@ class CloudAPI:
                 if endpoint.unit is not None:
                     endpstr += " " + endpoint.unit
                 message = TwitterMessage(endpstr)
+                return message.send()
+            return None
+        except LagartoException as ex:
+            ex.log()
+
+    @staticmethod
+    def push_dweet(endp, thing):
+        """
+        Push data to dweet
+
+        @param endp: endpoint identification string
+        format 1: process.location.name
+        format 2: process.id
+        """
+        try:
+            endpoint = NetworkAPI.get_endpoint(endp)
+            if endpoint is not None:
+                endpstr = endpoint.procname + "_" + endpoint.location + "_" + endpoint.name + "=" + str(endpoint.value)
+                message = DweetMessage(endpstr, thing)
                 return message.send()
             return None
         except LagartoException as ex:

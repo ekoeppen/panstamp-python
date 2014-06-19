@@ -208,6 +208,47 @@ class TwitterMessage:
         #truncate to the maximum chars allowed by twitter that is 160
         self.message=  timestring[:160]
 
+class DweetMessage:
+    values = {}
+
+    """
+    Text message to be sent to Dweet
+    """
+    def send(self):
+        """
+        Send message to Dweet.io
+        """
+        url = "dweet.io"
+        request = '/dweet/for/' + self.thing + '?' + self.value
+        # sep = '?'
+        # request = '/dweet/for/' + self.thing
+        # for key in DweetMessage.values:
+        #     request += sep + key + '=' + DweetMessage.values[key]
+        #     sep = '&'
+
+        res = None
+        try:
+            conn = httplib.HTTPConnection(url, timeout=8)
+            conn.request('GET', request)
+            response = conn.getresponse()
+            res = response.reason
+        except:
+            raise
+
+        conn.close()
+        return res
+
+    def __init__(self, value, thing):
+        """
+        Constructor
+
+        @param message: message text
+        """
+        self.thing = thing
+        self.value = value
+        (k, v) = value.split('=')
+        DweetMessage.values[k] = v
+
 class AutoRemotePacket:
     """
     Generic AutoRemote packet class
