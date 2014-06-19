@@ -131,6 +131,23 @@ class SwapNetwork:
                 return
 
 
+    def config_mote(self, old_address, new_address, state, channel, interval):
+        for m in self.motes:
+            if m.address == old_address:
+                if state == 0:
+                    m.restart()
+                elif state == 2:
+                    m.leaveSync()
+                if interval != -1:
+                    m.setTxInterval(interval)
+                if channel != -1:
+                    m.setFreqChannel(channel)
+                elif new_address != -1:
+                    m.setAddress(new_address)
+                    self.save()
+                return
+
+
     def get_mote(self, index=None, address=None):
         """
         Return mote from list given its index or address

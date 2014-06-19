@@ -194,6 +194,13 @@ class SwapManager(SwapInterface, LagartoServer):
                 self.network.save()
             elif command == "delete_mote":
                 self.network.delete_mote(int(params["address"]))
+            elif command == "config_mote":
+                mote_addr = int(params.get("moteaddr", "-1"))
+                new_address = int(params.get("address", "-1"))
+                state = int(params.get("state", "-1"))
+                channel = int(params.get("channel", "-1"))
+                interval = int(params.get("interval", "-1"))
+                self.network.config_mote(mote_addr, new_address, state, channel, interval)
             else:
                 # Save gateway's wireless settings
                 if command == "modem_network":

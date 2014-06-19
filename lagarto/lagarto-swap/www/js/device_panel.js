@@ -43,10 +43,31 @@ function addMote(mote)
   cfglink.onclick = function() {return confirm("Delete mote?");};
   cfglink.setAttribute("alt", "delete");
   cfglink.style.pointer = "cursor";
-  cell.appendChild(cfglink);
   img = document.createElement("img");
   img.setAttribute("src","/lagarto/images/delete.png");
   img.title = "delete";
   cfglink.appendChild(img);
+  cell.appendChild(cfglink);
+
+  cfglink = document.createElement("a");
+  cfglink.setAttribute("href", "config_device.html/?address=" + mote.address);
+  /*
+  cfglink.setAttribute("href", "/command/change_mote_address/?old_address=" + mote.address);
+  cfglink.onclick = function() {
+	  var new_address = prompt("New address");
+	  if (new_address != null && new_address.length > 0) {
+		  var action = this.getAttribute("href") + "&new_address=" + new_address;
+		  location.assign(action);
+	  }
+	  return false;
+  };
+  */
+  cfglink.setAttribute("alt", "edit");
+  cfglink.style.pointer = "cursor";
+  img = document.createElement("img");
+  img.setAttribute("src","/lagarto/images/edit.png");
+  img.title = "edit";
+  cfglink.appendChild(img);
+  cell.appendChild(cfglink);
 }
 
