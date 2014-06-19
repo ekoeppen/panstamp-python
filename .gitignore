@@ -1,5 +1,16 @@
+# Automatically updated files
+lagarto/lagarto-swap/config/
+lagarto/lagarto-max/logs/
+pyswapdmtgui/src/config/
+pyswapdmt/src/devices/
+lagarto/lagarto-max/database/
+swapnet.json
+
 # SVN repo files
 .svn
+
+# Editor files
+*.swp
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
