@@ -116,9 +116,9 @@ class SerialModem:
         """
         if self._sermode == SerialModem.Mode.DATA:
             return True
-        
-        response = self.runAtCommand("ATO\r")
-        
+
+        response = self.runAtCommand("ATO\n")
+
         if response is not None:
             if response[0:2] == "OK":
                 self._sermode = SerialModem.Mode.DATA;
@@ -137,18 +137,19 @@ class SerialModem:
         if self._sermode == SerialModem.Mode.DATA:
             self.goToCommandMode()
         # Run AT command
-        response = self.runAtCommand("ATZ\r")
+        response = self.runAtCommand("ATZ\n")
         if response is None:
             return False
         
         if response[0:2] == "OK":
+            self._wait_modem_start = True
             self._sermode = SerialModem.Mode.DATA
             return True
         
         return False
 
 
-    def runAtCommand(self, cmd="AT\r", timeout=1000):
+    def runAtCommand(self, cmd="AT\n", timeout=1000):
         """
         Run AT command on the serial gateway
         
@@ -181,7 +182,7 @@ class SerialModem:
         
         @param packet: CcPacket to be transmitted
         """
-        strBuf = packet.toString() + "\r"
+        strBuf = packet.toString() + "\n"
         self._serport.send(strBuf)
 
    
@@ -198,7 +199,7 @@ class SerialModem:
         if self._sermode == SerialModem.Mode.DATA:
             self.goToCommandMode()
         # Run AT command
-        response =  self.runAtCommand("ATCH=" + "{0:02X}".format(value) + "\r")
+        response =  self.runAtCommand("ATCH=" + "{0:02X}".format(value) + "\n")
         if response is None:
             return False
         if response[0:2] == "OK":
@@ -220,7 +221,7 @@ class SerialModem:
         if self._sermode == SerialModem.Mode.DATA:
             self.goToCommandMode()
         # Run AT command
-        response = self.runAtCommand("ATSW=" + "{0:04X}".format(value) + "\r")
+        response = self.runAtCommand("ATSW=" + "{0:04X}".format(value) + "\n")
         if response is None:
             return False
         if response[0:2] == "OK":
@@ -243,7 +244,7 @@ class SerialModem:
         if self._sermode == SerialModem.Mode.DATA:
             self.goToCommandMode()
         # Run AT command
-        response = self.runAtCommand("ATDA=" + "{0:02X}".format(value) + "\r")
+        response = self.runAtCommand("ATDA=" + "{0:02X}".format(value) + "\n")
         if response is None:
             return False
         if response[0:2] == "OK":
@@ -318,33 +319,33 @@ class SerialModem:
                 raise SwapException("Modem is unable to enter command mode")
     
             # Hardware version
-            response = self.runAtCommand("ATHV?\r")
+            response = self.runAtCommand("ATHV?\n")
             if response is None:
                 raise SwapException("Unable to retrieve Hardware Version from serial modem")
             self.hwversion = long(response, 16)
     
             # Firmware version
-            response = self.runAtCommand("ATFV?\r")
+            response = self.runAtCommand("ATFV?\n")
             if response is None:
                 raise SwapException("Unable to retrieve Firmware Version from serial modem")
             self.fwversion = long(response, 16)
     
             # Frequency channel
-            response = self.runAtCommand("ATCH?\r")
+            response = self.runAtCommand("ATCH?\n")
             if response is None:
                 raise SwapException("Unable to retrieve Frequency Channel from serial modem")
             ## Frequency channel of the serial gateway
             self.freq_channel = int(response, 16)
     
             # Synchronization word
-            response = self.runAtCommand("ATSW?\r")
+            response = self.runAtCommand("ATSW?\n")
             if response is None:
                 raise SwapException("Unable to retrieve Synchronization Word from serial modem")
             ## Synchronization word of the serial gateway
             self.syncword = int(response, 16)
     
             # Device address
-            response = self.runAtCommand("ATDA?\r")
+            response = self.runAtCommand("ATDA?\n")
             if response is None:
                 raise SwapException("Unable to retrieve Device Address from serial modem")
             ## Device address of the serial gateway

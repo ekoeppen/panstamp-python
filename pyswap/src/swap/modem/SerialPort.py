@@ -39,7 +39,7 @@ class SerialPort(threading.Thread):
     Wrapper class of the pyserial package
     """
     # Minimum delay between transmissions (in seconds)
-    txdelay = 0.05
+    txdelay = 0.2
 
 
     def run(self):
@@ -60,7 +60,7 @@ class SerialPort(threading.Thread):
                         ch = self._serport.read()
                         if len(ch) > 0: 
                             # End of serial packet?
-                            if ch == '\r' or ((ch == '(') and (len(serbuf) > 0)):
+                            if ch == '\n' or ((ch == '(') and (len(serbuf) > 0)):
                                 strBuf = "".join(serbuf)
                                 serbuf = []
         
@@ -74,7 +74,7 @@ class SerialPort(threading.Thread):
                                         self.serial_received(strBuf)
                                     except SwapException as ex:
                                         ex.display()
-                            elif ch != '\n':
+                            elif ch != '\r':
                                 # Append char at the end of the buffer (list)
                                 serbuf.append(ch)
                         else:
@@ -142,14 +142,12 @@ class SerialPort(threading.Thread):
         Hardware reset serial modem
         """
         # Clear DTR/RTS lines
-        self._serport.setDTR(False)
-        self._serport.setRTS(False)
-
-        time.sleep(0.001)
-
-        # Set DTR/R lines
         self._serport.setDTR(True)
         self._serport.setRTS(True)
+        self._serport.setRTS(False)
+        time.sleep(0.05)
+        self._serport.setDTR(False)
+
 
            
     def __init__(self, portname="/dev/ttyUSB0", speed=38400, verbose=False):
