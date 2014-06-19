@@ -53,10 +53,15 @@ import wxversion
 
 if wxversion.checkInstalled("2.8"):
     wx_version = "2.8"
-    from wx.lib.pubsub import Publisher
-    pub = Publisher
+    from wx.lib.pubsub import setupkwargs
+    from wx.lib.pubsub import pub
 elif wxversion.checkInstalled("2.9"):
     wx_version = "2.9"
+    from wx.lib.pubsub import setupkwargs
+    from wx.lib.pubsub import pub
+elif wxversion.checkInstalled("3.0"):
+    wx_version = "3.0"
+    from wx.lib.pubsub import setupkwargs
     from wx.lib.pubsub import pub
 else:
     print "version of wxpython not supported"
@@ -182,10 +187,7 @@ class MainFrame(wx.Frame):
         
         @param msg: message containing the mote to be added to the tree
         """
-        if wx_version == "2.8":
-            event = msg.data
-        else:
-            event = msg
+        event = msg
         if isinstance(event, str):
             self.event_panel.print_event(event)
             
@@ -196,10 +198,7 @@ class MainFrame(wx.Frame):
         
         @param msg: message containing the mote to be added to the tree
         """
-        if wx_version == "2.8":
-            mote = msg.data
-        else:
-            mote = msg
+        mote = msg
         if mote.__class__.__name__ == "SwapMote":
             self.browser_panel.addMote(mote)
             
@@ -211,19 +210,16 @@ class MainFrame(wx.Frame):
         @param msg: not used
         """ 
         if self._waitfor_startdialog is not None:
-            wx.CallAfter(pub.sendMessage, "close_wait", None)
-        
-           
+            wx.CallAfter(pub.sendMessage, "close_wait", msg=None)
+
+
     def cb_changed_addr(self, msg):
         """
         Request from SWAP server thread to change a mote address from the browser tree
         
         @param msg: message containing the mote to be modified from the tree
         """
-        if wx_version == "2.8":
-            mote = msg.data
-        else:
-            mote = msg
+        mote = msg
         if mote.__class__.__name__ == "SwapMote":
             self.browser_panel.updateAddressInTree(mote)
             
@@ -234,10 +230,7 @@ class MainFrame(wx.Frame):
         
         @param msg: message containing the mote to be modified from the tree
         """
-        if wx_version == "2.8":
-            endpoint = msg.data
-        else:
-            endpoint = msg
+        endpoint = msg
         if endpoint.__class__.__name__ in ["SwapEndpoint", "SwapCfgParam"]:
             self.browser_panel.updateEndpointInTree(endpoint)
 
@@ -248,10 +241,7 @@ class MainFrame(wx.Frame):
         
         @param mote  Mote having entered the SYNC mode
         """
-        if wx_version == "2.8":
-            mote = msg.data
-        else:
-            mote = msg
+        mote = msg
         if mote.__class__.__name__ == "SwapMote":
             if self._waitfor_syncdialog is not None:
                 self._moteinsync = mote
@@ -898,11 +888,7 @@ class SnifferPanel(wx.Panel):
         
         @param msg: message containing the packet received
         """
-        if wx_version == "2.8":
-            packet = msg.data
-        else:
-            packet = msg
-            
+        packet = msg
         msgtype = self.get_message_type(packet)
         rssi = "{0:02X}".format(packet.rssi)
         lqi = "{0:02X}".format(packet.lqi)
@@ -923,11 +909,7 @@ class SnifferPanel(wx.Panel):
         
         @param msg: message containing the packet sent
         """
-        if wx_version == "2.8":
-            packet = msg.data
-        else:
-            packet = msg
-            
+        packet = msg
         msgtype = self.get_message_type(packet)
                             
         index = self.log_list.GetItemCount()
