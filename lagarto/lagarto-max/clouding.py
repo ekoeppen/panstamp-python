@@ -233,7 +233,7 @@ class DweetMessage:
             response = conn.getresponse()
             res = response.reason
         except:
-            raise
+            pass
 
         conn.close()
         return res
