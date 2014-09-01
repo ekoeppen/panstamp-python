@@ -420,24 +420,16 @@ class LagartoClient(threading.Thread, LagartoProcess):
         self.sub_socket = None
         if self.config.broadcast is not None:
             self.sub_socket = self.context.socket(zmq.SUB)
+            self.sub_socket.setsockopt(zmq.SUBSCRIBE, '')
 
-            # Bind/connect ZMQ SUB socket
+            # connect ZMQ SUB socket
             try:
-                # Try binding socket first
-                if self.sub_socket.bind(self.config.broadcast) == -1:
-                    raise LagartoException("Unable to bind zmq sub socket to " + self.config.broadcast)
+                if self.sub_socket.connect(self.config.broadcast) == -1:
+                    raise LagartoException("Unable to connect zmq sub socket to " + self.config.broadcast)
                 else:
-                    self.sub_socket.setsockopt(zmq.SUBSCRIBE, "")
-                    print "ZMQ SUB socket binded to", self.config.broadcast                
+                    print "ZMQ SUB socket connected to ", self.config.broadcast
             except zmq.ZMQError as ex:
-                try:
-                    # Now try connecting to the socket
-                    if self.sub_socket.connect(self.config.broadcast) == -1:
-                        raise LagartoException("Unable to connect zmq sub socket to " + self.config.broadcast)
-                    else:
-                        print "ZMQ SUB socket connected to ", self.config.broadcast
-                except zmq.ZMQError as ex:
-                    raise LagartoException("Unable to establish connection with zmq sub socket")
+                raise LagartoException("Unable to establish connection with zmq sub socket")
 
 
         # List of HTTP servers
