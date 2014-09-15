@@ -1,9 +1,13 @@
 # Automatically updated files
-lagarto/lagarto-swap/config/
 lagarto/lagarto-max/logs/
+lagarto/lagarto-max/config/
+lagarto/lagarto-max/database/
+lagarto/lagarto-max/webscripts.py
+lagarto/lagarto-swap/config/
 pyswapdmtgui/src/config/
 pyswapdmt/src/devices/
-lagarto/lagarto-max/database/
+pyswapdmt/src/settings.xml
+pyswapdmt/src/serial.xml
 swapnet.json
 
 # SVN repo files
