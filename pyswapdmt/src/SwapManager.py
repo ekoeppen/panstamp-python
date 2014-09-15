@@ -26,8 +26,8 @@ __author__="Daniel Berenguer"
 __date__ ="$Aug 21, 2011 4:30:47 PM$"
 #########################################################################
 
-from SwapInterface import SwapInterface
-from swap.SwapDefs import SwapState
+from swap.SwapInterface import SwapInterface
+from swap.protocol.SwapDefs import SwapState
 
 class SwapManager(SwapInterface):
     """
@@ -36,7 +36,7 @@ class SwapManager(SwapInterface):
     def newMoteDetected(self, mote):
         """
         New mote detected by SWAP server
-        
+
         'mote'  Mote detected
         """
         if self._printSWAP == True:
