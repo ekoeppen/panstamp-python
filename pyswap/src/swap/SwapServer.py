@@ -28,7 +28,7 @@ __date__ ="$Aug 20, 2011 10:36:00 AM$"
 
 from modem.SerialModem import SerialModem
 from protocol.SwapRegister import SwapRegister
-from protocol.SwapDefs import SwapFunction, SwapRegId
+from protocol.SwapDefs import SwapFunction, SwapRegId, SwapState
 from protocol.SwapPacket import SwapPacket, SwapQueryPacket, SwapStatusPacket
 from protocol.SwapMote import SwapMote
 from protocol.SwapNetwork import SwapNetwork
@@ -103,6 +103,8 @@ class SwapServer(threading.Thread):
             # Return to data mode if necessary
             if param_changed == True:
                 self.modem.goToDataMode()
+
+            self.outstanding_commands = [];
                             
             self.is_running = True
             
@@ -293,6 +295,10 @@ class SwapServer(threading.Thread):
             if self._eventHandler.moteStateChanged is not None:
                 self._eventHandler.moteStateChanged(mote)
 
+            # Check outstanding commands for this mote
+            if state == SwapState.RXON or state == SwapState.SYNC:
+                self._checkOutstandingCommands(mote)
+
 
     def _updateMoteTxInterval(self, packet):
         """
@@ -424,6 +430,22 @@ class SwapServer(threading.Thread):
         t.start()
 
 
+    def _addOutstandingCommand(self, mote, regid, value):
+        """
+        Store a command which could not be sent to a mote for later use
+        """
+        print "Adding outstanding command to set register " + str(regid)
+        self.outstanding_commands.append((mote, regid, value))
+
+
+    def _checkOutstandingCommands(self, mote):
+        for command in self.outstanding_commands[:]:
+            if mote == command[0]:
+                print "Resending command for mote %d register, %d " % (command[0].address, command[1])
+                self.outstanding_commands.remove(command)
+                self.setMoteRegister(command[0], command[1], command[2])
+
+
     def _endPollingValues(self):
         """
         End polling regular registers each time a product code is received
@@ -488,6 +510,7 @@ class SwapServer(threading.Thread):
                     # Send status message
                     self.send_status(mote, regid)
                 return True;    # ACK received
+        self._addOutstandingCommand(mote, regid, value)
         return False            # Got no ACK from mote
 
 
