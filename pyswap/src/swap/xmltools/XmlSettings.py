@@ -53,6 +53,8 @@ class XmlSettings(object):
     updatedef = False
     ## Name/path of the error log file
     error_file = "swap.err"
+    ## Only report changed registers
+    report_all = False
 
     def read(self):
         """
@@ -96,6 +98,10 @@ class XmlSettings(object):
         elem = root.find("errlog")
         if elem is not None:
             XmlSettings.error_file = elem.text
+        # Get setting for forced sending of unchanged register values
+        elem = root.find("reportall")
+        if elem is not None:
+            XmlSettings.report_all = elem.text.lower() in ["true", "enabled", "yes"]
 
 
     def save(self):
@@ -114,6 +120,7 @@ class XmlSettings(object):
         f.write("\t<serial>" + self.serial_file + "</serial>\n")
         f.write("\t<network>" + self.network_file + "</network>\n")
         f.write("\t<swapnet>" + self.swap_file + "</swapnet>\n")
+        f.write("\t<reportall>" + self.report_all + "</reportall>\n")
         f.write("</settings>\n")
         f.close()
 

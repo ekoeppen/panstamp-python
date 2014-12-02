@@ -330,7 +330,7 @@ class SwapServer(threading.Thread):
                     if reg.id == packet.regId:
                         # Check if value changed and its length
                         if reg.value is not None:
-                            if reg.value.isEqual(packet.value):
+                            if reg.value.isEqual(packet.value) and not self._xmlSettings.report_all:
                                 return
                             if packet.value is None:
                                 return
@@ -346,7 +346,7 @@ class SwapServer(threading.Thread):
                         if self._eventHandler.endpointValueChanged is not None:
                             # Has any of the endpoints changed?
                             for endp in reg.parameters:
-                                if endp.valueChanged == True:
+                                if endp.valueChanged == True or self._xmlSettings.report_all:
                                     self._eventHandler.endpointValueChanged(endp)
                         return
             # Search within its list of config registers
@@ -483,7 +483,7 @@ class SwapServer(threading.Thread):
             # Send command            
             ack = mote.cmdRegister(regid, value)
             # Wait for aknowledgement from mote
-            if self._waitForAck(ack, SwapServer._MAX_WAITTIME_ACK):
+            if ack == None or self._waitForAck(ack, SwapServer._MAX_WAITTIME_ACK):
                 if sendack:
                     # Send status message
                     self.send_status(mote, regid)
@@ -505,7 +505,7 @@ class SwapServer(threading.Thread):
             # Send command            
             ack = endpoint.sendSwapCmd(value)
             # Wait for aknowledgement from mote
-            if self._waitForAck(ack, SwapServer._MAX_WAITTIME_ACK):
+            if ack == None or self._waitForAck(ack, SwapServer._MAX_WAITTIME_ACK):
                 return True;    # ACK received
         return False            # Got no ACK from mote
 
