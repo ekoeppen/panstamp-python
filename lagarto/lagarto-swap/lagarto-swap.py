@@ -30,6 +30,7 @@ __version__= "0.1.7"
 
 from swap.SwapException import SwapException
 from swapmanager import SwapManager
+from ModemMote import ModemMote
 
 from lagartoresources import LagartoException
 
@@ -44,6 +45,7 @@ def signal_handler(signal, frame):
     """
     Handle signal received
     """
+    swap_manager.server.network.delete_mote(1)
     swap_manager.stop()
     sys.exit(0)
 
@@ -58,6 +60,8 @@ if __name__ == '__main__':
     try:      
         # SWAP manager
         swap_manager = SwapManager(settings)     
+        modem_mote = ModemMote(swap_manager.server, "0000002800000001", 1)
+        swap_manager.server.network.add_mote(modem_mote)
     except SwapException as ex:
         ex.display()
         ex.log()

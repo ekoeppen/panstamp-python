@@ -16,4 +16,7 @@
   <developer id="17" name="Robomotic">
     <dev id="2" name="SeismoFloor" label="Floor sensor"/>
   </developer>
+  <developer id="40" name="40Hz">
+    <dev id="1" name="modem" label="Modem mote"/>
+  </developer>
 </devices>
