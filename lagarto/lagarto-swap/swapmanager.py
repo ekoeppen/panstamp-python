@@ -105,16 +105,15 @@ class SwapManager(SwapInterface, LagartoServer):
         # For every endpoint contained in this register
         for endp in register.parameters:
             strval = endp.getValueInAscii()
-            if endp.valueChanged:
-                if self._print_swap:
-                    if endp.unit is not None:
-                        strval += " " + endp.unit.name
-                    print endp.name + " in address " + str(endp.getRegAddress()) + " changed to " + strval
-                               
-                if endp.display:
-                    endp_data = endp.dumps()
-                    if endp_data is not None:
-                        status.append(endp_data)
+            if self._print_swap:
+                if endp.unit is not None:
+                    strval += " " + endp.unit.name
+                print endp.name + " in address " + str(endp.getRegAddress()) + " changed to " + strval
+            
+            if endp.display:
+                endp_data = endp.dumps()
+                if endp_data is not None:
+                    status.append(endp_data)
         
         if len(status) > 0:        
             self.publish_status(status)
