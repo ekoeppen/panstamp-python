@@ -301,18 +301,6 @@ class SerialModem:
             # Run serial port thread
             self._serport.start()
                
-            # This flags switches to True when the serial modem is ready
-            self._wait_modem_start = False
-            start = time.time()
-            soft_reset = False
-            while self._wait_modem_start == False:
-                elapsed = time.time() - start
-                if not soft_reset and elapsed > 5:
-                    self.reset()
-                    soft_reset = True
-                elif soft_reset and elapsed > 10:
-                    raise SwapException("Unable to reset serial modem")
-
             # Retrieve modem settings
             # Switch to command mode
             if not self.goToCommandMode():
