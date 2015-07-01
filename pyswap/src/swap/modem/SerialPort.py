@@ -32,6 +32,7 @@ import threading
 import serial
 import time, sys
 import Queue
+import datetime
 
 
 class SerialPort(threading.Thread):
@@ -66,7 +67,7 @@ class SerialPort(threading.Thread):
         
                                 # Enable for debug only
                                 if self._verbose == True:
-                                    print "Rved: " + strBuf
+                                    print str(datetime.datetime.now()) + "   Rved: " + strBuf
                                 
                                 # Notify reception
                                 if self.serial_received is not None:
@@ -95,7 +96,7 @@ class SerialPort(threading.Thread):
                             self.last_transmission_time = time.time()                       
                             # Enable for debug only
                             if self._verbose == True:
-                                print "Sent: " + strpacket
+                                print str(datetime.datetime.now()) + "   Sent: " + strpacket.rstrip('\r\n')
                     #self._send_lock.release()
             else:
                 raise SwapException("Unable to read serial port " + self.portname + " since it is not open")

@@ -28,6 +28,7 @@ __date__  ="$Jan 23, 2012$"
 
 import os
 import sys
+import datetime
 
 from swap.SwapInterface import SwapInterface
 from swap.protocol.SwapDefs import SwapState
@@ -46,15 +47,23 @@ class SwapManager(SwapInterface, LagartoServer):
     """
     SWAP Management Class
     """
+
+    """
+    Conditional logging with timestamp
+    """
+    def log(self, s):
+        if self._print_swap == True:
+            print str(datetime.datetime.now()) + "   " + s
+
+
     def newMoteDetected(self, mote):
         """
         New mote detected by SWAP server
         
         @param mote: Mote detected
         """
-        if self._print_swap == True:
-            print "New mote with address " + str(mote.address) + " : " + mote.definition.product + \
-            " (by " + mote.definition.manufacturer + ")"
+        self.log("New mote with address " + str(mote.address) + " : " + mote.definition.product + \
+            " (by " + mote.definition.manufacturer + ")")
 
 
     def newEndpointDetected(self, endpoint):
@@ -63,8 +72,7 @@ class SwapManager(SwapInterface, LagartoServer):
         
         @param endpoint: Endpoint detected
         """
-        if self._print_swap == True:
-            print "New endpoint with Reg ID = " + str(endpoint.getRegId()) + " : " + endpoint.name
+        self.log("New endpoint with Reg ID = " + str(endpoint.getRegId()) + " : " + endpoint.name)
 
 
     def moteStateChanged(self, mote):
@@ -73,9 +81,8 @@ class SwapManager(SwapInterface, LagartoServer):
         
         @param mote: Mote having changed
         """
-        if self._print_swap == True:
-            print "Mote with address " + str(mote.address) + " switched to \"" + \
-            SwapState.toString(mote.state) + "\""     
+        self.log("Mote with address " + str(mote.address) + " switched to \"" + \
+            SwapState.toString(mote.state) + "\"")
 
 
     def moteAddressChanged(self, mote):
@@ -84,8 +91,7 @@ class SwapManager(SwapInterface, LagartoServer):
         
         @param mote: Mote having changed
         """
-        if self._print_swap == True:
-            print "Mote changed address to " + str(mote.address)
+        self.log("Mote changed address to " + str(mote.address))
 
 
     def registerValueChanged(self, register):
@@ -98,17 +104,15 @@ class SwapManager(SwapInterface, LagartoServer):
         if register.isConfig():
             return
         
-        if self._print_swap == True:
-            print  "Register addr= " + str(register.getAddress()) + " id=" + str(register.id) + " changed to " + register.value.toAsciiHex()
+        self.log("Register addr=" + str(register.getAddress()) + " id=" + str(register.id) + " changed to " + register.value.toAsciiHex())
         
         status = []
         # For every endpoint contained in this register
         for endp in register.parameters:
             strval = endp.getValueInAscii()
-            if self._print_swap:
-                if endp.unit is not None:
-                    strval += " " + endp.unit.name
-                print endp.name + " in address " + str(endp.getRegAddress()) + " changed to " + strval
+            if endp.unit is not None:
+                strval += endp.unit.name
+            self.log(endp.name + " in address " + str(endp.getRegAddress()) + " changed to " + strval)
             
             if endp.display:
                 endp_data = endp.dumps()
@@ -280,3 +284,4 @@ class SwapManager(SwapInterface, LagartoServer):
 
         if XmlSettings.debug == 2:
             self._print_swap = True
+        self.log("Logging enabled")

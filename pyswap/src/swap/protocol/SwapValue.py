@@ -80,7 +80,7 @@ class SwapValue(object):
         
         @return 
         """
-        return "".join(chr(item) for item in self._data)
+        return "".join(chr(item) if item >= 32 else '.' for item in self._data)
 
     
     def toAsciiHex(self):

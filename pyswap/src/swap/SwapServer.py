@@ -44,6 +44,7 @@ import time
 import urllib2
 import tarfile
 import os
+import datetime
 
 
 class SwapServer(threading.Thread):
@@ -56,6 +57,13 @@ class SwapServer(threading.Thread):
     _MAX_SWAP_COMMAND_TRIES = 3
 
    
+    """
+    Logging with timestamp
+    """
+    def log(self, s):
+        print str(datetime.datetime.now()) + "   " + s
+
+
     def run(self):
         """
         Start SWAP server thread
@@ -125,7 +133,7 @@ class SwapServer(threading.Thread):
         Stop SWAP server
         """
         
-        print "Stopping SWAP server..."
+        self.log("Stopping SWAP server...")
         
         # Stop modem
         if self.modem is not None:
@@ -133,7 +141,7 @@ class SwapServer(threading.Thread):
         self.is_running = False
         
         # Save network data
-        print "Saving network data..."
+        self.log("Saving network data...")
         
         try:
             self.network.save()
@@ -374,7 +382,7 @@ class SwapServer(threading.Thread):
                                     if param.valueChanged == True:
                                         self._eventHandler.parameterValueChanged(param)
                             return
-            return
+        self.log("Addr: %3d Reg: %3d   [%-32s] [%-32s]" % (packet.regAddress, packet.regId, packet.value.toAsciiStr(), packet.value.toAsciiHex()))
 
 
     def _checkStatus(self, status):
@@ -434,14 +442,14 @@ class SwapServer(threading.Thread):
         """
         Store a command which could not be sent to a mote for later use
         """
-        print "Adding outstanding command to set register " + str(regid)
+        self.log("Adding outstanding command to set register " + str(regid))
         self.outstanding_commands.append((mote, regid, value))
 
 
     def _checkOutstandingCommands(self, mote):
         for command in self.outstanding_commands[:]:
             if mote == command[0]:
-                print "Resending command for mote %d register, %d " % (command[0].address, command[1])
+                self.log("Resending command for mote %d register, %d " % (command[0].address, command[1]))
                 self.outstanding_commands.remove(command)
                 self.setMoteRegister(command[0], command[1], command[2])
 
@@ -622,7 +630,7 @@ class SwapServer(threading.Thread):
         """
         Update Device Definition Files from remote server
         """
-        print "Downloading Device Definition Files"
+        self.log("Downloading Device Definition Files")
         local_tar = XmlSettings.device_localdir + ".tar"
         
         try:
@@ -638,7 +646,7 @@ class SwapServer(threading.Thread):
             
             os.remove(local_tar)
         except:
-            print "Unable to update Device Definition Files"
+            self.log("Unable to update Device Definition Files")
         
         
     def __init__(self, eventHandler, settings=None, start=True):

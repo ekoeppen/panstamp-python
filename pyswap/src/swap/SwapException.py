@@ -38,7 +38,7 @@ class SwapException(Exception):
         """
         Print exception description
         """
-        print datetime.datetime.fromtimestamp(self.timestamp).strftime("%d-%m-%Y %H:%M:%S"), self.description
+        print str(datetime.datetime.fromtimestamp(self.timestamp)) + "   " + self.description
 
 
     def log(self):
