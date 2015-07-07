@@ -65,18 +65,12 @@ class SerialModem:
             self._atresponse = buf
             self.__atresponse_received = True
         # If modem in data mode
-        else:
-            # Waiting for ready signal from modem?
-            if self._wait_modem_start == False:
-                if buf == "Modem ready!":
-                    self._wait_modem_start = True
-            # Create CcPacket from string and notify reception
-            elif self._ccpacket_received is not None:
-                try:
-                    ccPacket = CcPacket(buf)
-                    self._ccpacket_received(ccPacket)
-                except SwapException:
-                    raise
+        elif self._ccpacket_received is not None:
+            try:
+                ccPacket = CcPacket(buf)
+                self._ccpacket_received(ccPacket)
+            except SwapException:
+                raise
 
 
     def setRxCallback(self, cbFunct):
