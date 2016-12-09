@@ -37,20 +37,19 @@ class SerialModem:
     Class representing a serial panstamp modem
     """
 
-    class Mode:
-        """
-        Serial modes
-        """
-        DATA = 0
-        COMMAND = 1
-
-
     def stop(self):
         """
         Stop serial gateway
         """
         if self._serport is not None:
             self._serport.stop()
+
+
+    def _ccpacket_received(self, packet):
+        """
+        Default packet handler
+        """
+        print packet
 
 
     def _serialPacketReceived(self, buf):
@@ -61,16 +60,15 @@ class SerialModem:
         @param buf: Serial packet received in String format
         """
         # If modem in command mode
-        if self._sermode == SerialModem.Mode.COMMAND:
-            self._atresponse = buf
-            self.__atresponse_received = True
-        # If modem in data mode
-        elif self._ccpacket_received is not None:
+        if buf[0] == '(':
             try:
                 ccPacket = CcPacket(buf)
                 self._ccpacket_received(ccPacket)
             except SwapException:
                 raise
+        else:
+            self._atresponse = buf
+            self.__atresponse_received = True
 
 
     def setRxCallback(self, cbFunct):
@@ -88,18 +86,7 @@ class SerialModem:
         
         @return True if the serial gateway does enter Command Mode. Return false otherwise
         """
-        if self._sermode == SerialModem.Mode.COMMAND:
-            return True
-        
-        self._sermode = SerialModem.Mode.COMMAND
-        response = self.runAtCommand("+++", 5000)
-
-        if response is not None:
-            if response[:2] == "OK":
-                return True
-        
-        self._sermode = SerialModem.Mode.DATA
-        return False
+        return True
 
 
     def goToDataMode(self):
@@ -108,17 +95,7 @@ class SerialModem:
         
         @return True if the serial gateway does enter Data Mode. Return false otherwise
         """
-        if self._sermode == SerialModem.Mode.DATA:
-            return True
-
-        response = self.runAtCommand("ATO\n")
-
-        if response is not None:
-            if response[0:2] == "OK":
-                self._sermode = SerialModem.Mode.DATA;
-                return True;
-        
-        return False;
+        return True
 
     
     def reset(self):
@@ -127,20 +104,7 @@ class SerialModem:
         
         @return True if the serial gateway is successfully restarted
         """
-        # Switch to command mode if necessary
-        if self._sermode == SerialModem.Mode.DATA:
-            self.goToCommandMode()
-        # Run AT command
-        response = self.runAtCommand("ATZ\n")
-        if response is None:
-            return False
-        
-        if response[0:2] == "OK":
-            self._wait_modem_start = True
-            self._sermode = SerialModem.Mode.DATA
-            return True
-        
-        return False
+        return True
 
 
     def runAtCommand(self, cmd="AT\n", timeout=1000):
@@ -189,9 +153,6 @@ class SerialModem:
         # Check format
         if value > 0xFF:
             raise SwapException("Frequency channels must be 1-byte length")
-        # Switch to command mode if necessary
-        if self._sermode == SerialModem.Mode.DATA:
-            self.goToCommandMode()
         # Run AT command
         response =  self.runAtCommand("ATCH=" + "{0:02X}".format(value) + "\n")
         if response is None:
@@ -211,9 +172,6 @@ class SerialModem:
         # Check format
         if value > 0xFFFF:
             raise SwapException("Synchronization words must be 2-byte length")
-        # Switch to command mode if necessary
-        if self._sermode == SerialModem.Mode.DATA:
-            self.goToCommandMode()
         # Run AT command
         response = self.runAtCommand("ATSW=" + "{0:04X}".format(value) + "\n")
         if response is None:
@@ -234,9 +192,6 @@ class SerialModem:
         # Check format
         if value > 0xFF:
             raise SwapException("Device addresses must be 1-byte length")
-        # Switch to command mode if necessary
-        if self._sermode == SerialModem.Mode.DATA:
-            self.goToCommandMode()
         # Run AT command
         response = self.runAtCommand("ATDA=" + "{0:02X}".format(value) + "\n")
         if response is None:
@@ -270,8 +225,6 @@ class SerialModem:
         @param speed: Serial baudrate in bps
         @param verbose: Print out SWAP traffic (True or False)
         """
-        # Serial mode (command or data modes)
-        self._sermode = SerialModem.Mode.DATA
         # Response to the last AT command sent to the serial modem
         self._atresponse = ""
         # AT response received from modem
@@ -332,8 +285,5 @@ class SerialModem:
                 raise SwapException("Unable to retrieve Device Address from serial modem")
             ## Device address of the serial gateway
             self.devaddress = int(response, 16)
-    
-            # Switch to data mode
-            self.goToDataMode()
         except:
             raise
