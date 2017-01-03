@@ -28,18 +28,20 @@ __appname__= "lagarto-swap"
 __version__= "0.1.7"
 #########################################################################
 
-from swap.SwapException import SwapException
-from swapmanager import SwapManager
-from ModemMote import ModemMote
-
-from lagartoresources import LagartoException
-
 import sys
 import os
 import time
 import signal
 
 swap_manager = None
+sys.path.append('../../')
+sys.path.append('../../pyswap/src')
+
+from swap.SwapException import SwapException
+from swapmanager import SwapManager
+from ModemMote import ModemMote
+
+from lagartoresources import LagartoException
 
 def signal_handler(signal, frame):
     """
