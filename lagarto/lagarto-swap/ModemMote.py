@@ -89,6 +89,7 @@ class ModemMote(SwapMote):
 	    if reg:
 		if regId == 129:
 		    l = time.localtime(time.time())
+		    time.sleep(0.1)
 		    reg.setValue(SwapValue("%c%c%c%c%c%c%c" % (l.tm_year % 256, l.tm_year / 256, l.tm_mon, l.tm_mday, l.tm_hour, l.tm_min, l.tm_sec), 7))
 	return reg
 
