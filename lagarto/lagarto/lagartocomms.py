@@ -88,15 +88,14 @@ class LagartoProcess(object):
         
         @return local IP address
         """
-        ipaddr = socket.gethostbyname(socket.gethostname())
-        if ipaddr.startswith("127.0"):
-            try:
-                s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                s.connect(("1.1.1.1", 8000))
-                ipaddr = s.getsockname()[0]
-                s.close()
-            except:
-                pass
+        ipaddr = "127.0.0.1"
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect(("1.1.1.1", 8000))
+            ipaddr = s.getsockname()[0]
+            s.close()
+        except:
+            pass
  
         return ipaddr
 

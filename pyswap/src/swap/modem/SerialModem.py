@@ -29,6 +29,7 @@ __date__ ="$Aug 20, 2011 10:36:00 AM$"
 import time
 
 from SerialPort import SerialPort
+from MQTTPort import MQTTPort
 from CcPacket import CcPacket
 from swap.SwapException import SwapException
 
@@ -242,48 +243,56 @@ class SerialModem:
 
         try:
             # Open serial port
-            self._serport = SerialPort(self.portname, self.portspeed, verbose)
-            # Define callback function for incoming serial packets
-            self._serport.setRxCallback(self._serialPacketReceived)
-            # Run serial port thread
-            self._serport.start()
-               
-            # Retrieve modem settings
-            # Switch to command mode
-            if not self.goToCommandMode():
-                raise SwapException("Modem is unable to enter command mode")
-    
-            # Hardware version
-            response = self.runAtCommand("ATHV?\n")
-            if response is None:
-                raise SwapException("Unable to retrieve Hardware Version from serial modem")
-            self.hwversion = long(response, 16)
-    
-            # Firmware version
-            response = self.runAtCommand("ATFV?\n")
-            if response is None:
-                raise SwapException("Unable to retrieve Firmware Version from serial modem")
-            self.fwversion = long(response, 16)
-    
-            # Frequency channel
-            response = self.runAtCommand("ATCH?\n")
-            if response is None:
-                raise SwapException("Unable to retrieve Frequency Channel from serial modem")
-            ## Frequency channel of the serial gateway
-            self.freq_channel = int(response, 16)
-    
-            # Synchronization word
-            response = self.runAtCommand("ATSW?\n")
-            if response is None:
-                raise SwapException("Unable to retrieve Synchronization Word from serial modem")
-            ## Synchronization word of the serial gateway
-            self.syncword = int(response, 16)
-    
-            # Device address
-            response = self.runAtCommand("ATDA?\n")
-            if response is None:
-                raise SwapException("Unable to retrieve Device Address from serial modem")
-            ## Device address of the serial gateway
-            self.devaddress = int(response, 16)
+            if self.portname.startswith("mqtt"):
+                self._serport = MQTTPort(self.portname, verbose)
+                self._serport.setRxCallback(self._serialPacketReceived)
+                self.devaddress = 1
+                self.syncword = 0xc0de
+                self.hwversion = 1
+                self.fwversion = 1
+                self.freq_channel = 70
+                self._serport.start()
+            else:
+                self._serport = SerialPort(self.portname, self.portspeed, verbose)
+                self._serport.setRxCallback(self._serialPacketReceived)
+                self._serport.start()
+                   
+                # Retrieve modem settings
+                # Switch to command mode
+                if not self.goToCommandMode():
+                    raise SwapException("Modem is unable to enter command mode")
+        
+                # Hardware version
+                response = self.runAtCommand("ATHV?\n")
+                if response is None:
+                    raise SwapException("Unable to retrieve Hardware Version from serial modem")
+                self.hwversion = long(response, 16)
+        
+                # Firmware version
+                response = self.runAtCommand("ATFV?\n")
+                if response is None:
+                    raise SwapException("Unable to retrieve Firmware Version from serial modem")
+                self.fwversion = long(response, 16)
+        
+                # Frequency channel
+                response = self.runAtCommand("ATCH?\n")
+                if response is None:
+                    raise SwapException("Unable to retrieve Frequency Channel from serial modem")
+                ## Frequency channel of the serial gateway
+                self.freq_channel = int(response, 16)
+        
+                # Synchronization word
+                response = self.runAtCommand("ATSW?\n")
+                if response is None:
+                    raise SwapException("Unable to retrieve Synchronization Word from serial modem")
+                ## Synchronization word of the serial gateway
+                self.syncword = int(response, 16)
+        
+                # Device address
+                response = self.runAtCommand("ATDA?\n")
+                if response is None:
+                    raise SwapException("Unable to retrieve Device Address from serial modem")
+                ## Device address of the serial gateway
+                self.devaddress = int(response, 16)
         except:
             raise
