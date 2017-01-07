@@ -52,6 +52,12 @@ class XmlSerial(object):
         elem = root.find("speed")
         if elem is not None:
             self.speed = int(elem.text)
+        elem = root.find("tx_topic")
+        if elem is not None:
+            self.tx_topic = elem.text
+        elem = root.find("rx_topic")
+        if elem is not None:
+            self.rx_topic = elem.text
     
     def save(self):
         """

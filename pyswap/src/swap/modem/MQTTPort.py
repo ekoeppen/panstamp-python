@@ -92,7 +92,7 @@ class MQTTPort(threading.Thread):
         pass
 
            
-    def __init__(self, server="mqtt://localhost:1883/serial", verbose=False):
+    def __init__(self, settings, verbose=False):
         """
         Class constructor
         
@@ -101,14 +101,16 @@ class MQTTPort(threading.Thread):
         @param verbose: Print out SWAP traffic (True or False)
         """
         threading.Thread.__init__(self)
-        self.portname = server
+        self.server = settings.port
+        self.tx_topic = settings.tx_topic
+        self.rx_topic = settings.rx_topic
         self.serial_received = None
         self._strtosend = Queue.Queue()
         self._verbose = verbose
         self.client = mqtt.Client("lagarto", True, self)
         self.client.on_connect = on_connect
         self.client.on_message = on_message
-        p = urlparse(server)
+        p = urlparse(self.server)
         self.topic = p.path[1:]
 
         self.client.connect(p.hostname, p.port, 60)

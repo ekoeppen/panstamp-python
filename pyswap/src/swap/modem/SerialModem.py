@@ -232,10 +232,6 @@ class SerialModem:
         self.__atresponse_received = None
         # "Packet received" callback function. To be defined by the parent object
         self._ccpacket_received = None
-        ## Name(path) of the serial port
-        self.portname = xmlserial.portname
-        ## Speed of the serial port in bps
-        self.portspeed = xmlserial.speed
         ## Hardware version of the serial modem
         self.hwversion = None
         ## Firmware version of the serial modem
@@ -243,8 +239,8 @@ class SerialModem:
 
         try:
             # Open serial port
-            if self.portname.startswith("mqtt"):
-                self._serport = MQTTPort(self.portname, xmlserial.tx_topic, xmlserial.rx_topic, verbose)
+            if xmlserial.port.startswith("mqtt"):
+                self._serport = MQTTPort(xmlserial, verbose)
                 self._serport.setRxCallback(self._serialPacketReceived)
                 self.devaddress = 1
                 self.syncword = 0xc0de
@@ -253,7 +249,7 @@ class SerialModem:
                 self.freq_channel = 70
                 self._serport.start()
             else:
-                self._serport = SerialPort(self.portname, self.portspeed, verbose)
+                self._serport = SerialPort(xmlserial.port, xmlserial.speed, verbose)
                 self._serport.setRxCallback(self._serialPacketReceived)
                 self._serport.start()
                    
