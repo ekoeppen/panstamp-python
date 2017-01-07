@@ -92,7 +92,7 @@ class MQTTPort(threading.Thread):
         pass
 
            
-    def __init__(self, server="mqtt://localhost:1883/modem", verbose=False):
+    def __init__(self, server="mqtt://localhost:1883/serial", verbose=False):
         """
         Class constructor
         
