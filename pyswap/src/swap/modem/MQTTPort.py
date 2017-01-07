@@ -34,7 +34,7 @@ import paho.mqtt.client as mqtt
 
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
-    client.subscribe(userdata.topic + "/rx")
+    client.subscribe(userdata.rx_topic)
 
 
 def on_message(client, userdata, msg):
@@ -56,7 +56,7 @@ class MQTTPort(threading.Thread):
             self.client.loop()
             if not self._strtosend.empty():
                 strpacket = self._strtosend.get()          
-                self.client.publish(self.topic + "/tx", strpacket) 
+                self.client.publish(self.tx_topic, strpacket) 
         print "Closing MQTT connection..."
 
     

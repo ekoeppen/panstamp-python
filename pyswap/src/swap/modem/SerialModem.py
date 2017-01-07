@@ -218,7 +218,7 @@ class SerialModem:
         return True
 
 
-    def __init__(self, portname="/dev/ttyUSB0", speed=38400, verbose=False):
+    def __init__(self, xmlserial, verbose=False):
         """
         Class constructor
         
@@ -233,9 +233,9 @@ class SerialModem:
         # "Packet received" callback function. To be defined by the parent object
         self._ccpacket_received = None
         ## Name(path) of the serial port
-        self.portname = portname
+        self.portname = xmlserial.portname
         ## Speed of the serial port in bps
-        self.portspeed = speed
+        self.portspeed = xmlserial.speed
         ## Hardware version of the serial modem
         self.hwversion = None
         ## Firmware version of the serial modem
@@ -244,7 +244,7 @@ class SerialModem:
         try:
             # Open serial port
             if self.portname.startswith("mqtt"):
-                self._serport = MQTTPort(self.portname, verbose)
+                self._serport = MQTTPort(self.portname, xmlserial.tx_topic, xmlserial.rx_topic, verbose)
                 self._serport.setRxCallback(self._serialPacketReceived)
                 self.devaddress = 1
                 self.syncword = 0xc0de

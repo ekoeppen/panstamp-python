@@ -79,7 +79,7 @@ class SwapServer(threading.Thread):
             self._xmlserial = XmlSerial(self._xmlSettings.serial_file)
         
             # Create and start serial modem object
-            self.modem = SerialModem(self._xmlserial.port, self._xmlserial.speed, self.verbose)
+            self.modem = SerialModem(self._xmlserial, self.verbose)
 
             # Declare receiving callback function
             self.modem.setRxCallback(self._ccPacketReceived)
